@@ -2,6 +2,7 @@ package com.labs.springbootrestapi.controller;
 
 import com.labs.springbootrestapi.bean.Student;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -12,23 +13,27 @@ public class StudentController {
 
 //    http://localhost:8080/student
     @GetMapping("/student")
-    public Student getStudent() {
+    public ResponseEntity<Student> getStudent() {
         final Student student = new Student(
                 1, "John", "Doe"
         );
-        return student;
+//        return new ResponseEntity<>(student, HttpStatus.OK);
+//        return ResponseEntity.ok(student);
+        return ResponseEntity.ok()
+                .header("custom-header", "John")
+                .body(student);
     }
 
 
     /* http://localhost:8080/students */
     @GetMapping("/students")
-    public List<Student> getStudents(){
+    public ResponseEntity<List<Student>> getStudents(){
         List<Student> students = new ArrayList<>();
         students.add(new Student(1, "John", "Doe"));
         students.add(new Student(2, "Okira", "Bukaran"));
         students.add(new Student(3, "Kertan", "Riara"));
         students.add(new Student(4, "Noiq", "Jiuan"));
-        return students;
+        return ResponseEntity.ok(students);
     }
 
     /* Springboot REST API with path variable
@@ -36,20 +41,22 @@ public class StudentController {
      * http://localhost:8080/student/1/John/Doe
      * */
     @GetMapping("/student/{id}/{first-name}/{last-name}")
-    public Student studentPathVariable(@PathVariable("id") int studentId,
+    public ResponseEntity<Student> studentPathVariable(@PathVariable("id") int studentId,
                                        @PathVariable("first-name") String firstName,
                                        @PathVariable("last-name") String lastName) {
-        return new Student(studentId, firstName, lastName);
+        final Student student = new Student(studentId, firstName, lastName);
+        return ResponseEntity.ok(student);
     }
 
     /* Springboot REST API with Request Param
      * http://localhost:8080/student/query?studentId=1&firstName=John&lastName=Doe
      */
     @GetMapping("/student/query")
-    public Student studentRequestVariable(@RequestParam int studentId,
+    public ResponseEntity<Student> studentRequestVariable(@RequestParam int studentId,
                                           @RequestParam String firstName,
                                           @RequestParam String lastName) {
-        return new Student(studentId, firstName, lastName);
+        final Student student = new Student(studentId, firstName, lastName);
+        return ResponseEntity.ok(student);
     }
 
     /* Springboot REST API that handles HTTPS POST Request
@@ -57,12 +64,12 @@ public class StudentController {
      * http://localhost:8080/student/create
      * */
     @PostMapping("/students/create")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Student createStudent(@RequestBody Student student) {
+//    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<Student> createStudent(@RequestBody Student student) {
         System.out.println(student.getId());
         System.out.println(student.getFirstName());
         System.out.println(student.getLastName());
-        return student;
+        return new ResponseEntity<>(student, HttpStatus.CREATED);
     }
 
     /* Springboot REST API that handles HTTPS PUT Request
@@ -70,10 +77,10 @@ public class StudentController {
      * http://localhost:8080/student/1/update
      * */
     @PutMapping("students/{id}/update")
-    public Student updateStudent(@RequestBody Student student, @PathVariable("id") int studentId) {
+    public ResponseEntity<Student> updateStudent(@RequestBody Student student, @PathVariable("id") int studentId) {
         System.out.println(student.getFirstName());
         System.out.println(student.getLastName());
-        return student;
+        return ResponseEntity.ok(student);
     }
 
     /* Springboot REST API that handles HTTPS PUT Request
@@ -81,8 +88,8 @@ public class StudentController {
      * http://localhost:8080/student/1/delete
      * */
     @DeleteMapping("/students/{id}/delete")
-    public String deleteStudent(@PathVariable("id") int studentId){
+    public ResponseEntity<String> deleteStudent(@PathVariable("id") int studentId){
         System.out.println(studentId);
-        return "Delete Successfully";
+        return ResponseEntity.ok("Delete Successfully");
     }
 }
